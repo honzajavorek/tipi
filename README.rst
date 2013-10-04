@@ -9,10 +9,17 @@ Status: ACTIVE
 
 Under active development and maintenance. Embryonal phase of development (more ideas than code).
 
+Idea
+----
+
+- Input is HTML code, output is the same HTML code with changes in typography (entities, spaces, quotes, etc.).
+- `You can't parse HTML with regex. <http://stackoverflow.com/a/1732454/325365>`_
+- The best existing HTML parser and *tokenizer* for Python is `lxml <http://lxml.de/>`_.
+- There are more languages than English in the world. Each of them has different typographic rules.
+
 Plans
 -----
 
-- Entities changed according to Czech customs, not English.
 - Inspiration from `Tipogrify <http://static.mintchaos.com/projects/typogrify/>`_?
 - Coupling with `Markdown <https://bitbucket.org/jeunice/mdx_smartypants/src/251fb53a1885/mdx_smartypants.py>`_.
 - Get some inspiration from `Texy! <https://github.com/dg/texy/blob/master/Texy/modules/TexyTypographyModule.php>`_
