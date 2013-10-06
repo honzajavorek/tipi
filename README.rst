@@ -7,7 +7,7 @@ Tipi will be a tool for converting plain ASCII punctuation characters into HTML 
 Status: ACTIVE
 --------------
 
-Under active development and maintenance. Embryonal phase of development (more ideas than code).
+Under active development and maintenance.
 
 Idea
 ----
@@ -27,6 +27,7 @@ Plans
 - Get some inspiration from `Liteera.cz <http://www.liteera.cz/>`_) (`source <https://is.muni.cz/auth/th/172528/fi_b?info=1;zpet=%2Fauth%2Fvyhledavani%2F%3Fsearch%3Djakub%20fiala%26start%3D1>`_).
 - Maybe also some inspiration `from here <http://www.webtvorba.cz/web/typografie-na-webu.html>`_.
 - `Texy! rules extracted to RegExps <https://gist.github.com/msgre/3805872>`_.
+- `Texy! tests <https://github.com/dg/texy/tree/release-2.x/tests/Texy>`_.
 
 License: MIT
 ------------
