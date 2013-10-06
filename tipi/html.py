@@ -8,6 +8,9 @@ from collections import namedtuple, MutableSequence
 import lxml.html
 
 
+__all__ = ('HTMLFragment',)
+
+
 CharAddress = namedtuple('CharAddress', [
     'char',
     'element',
@@ -146,6 +149,9 @@ class HTMLFragment(MutableSequence):
 
         self._mutate_tree(index, insert_item)
         self.adresses = self._analyze(self.tree)
+
+    def text(self):
+        return ''.join(list(self))
 
     def __unicode__(self):
         s = lxml.html.tostring(self.tree, encoding=self.output_encoding)

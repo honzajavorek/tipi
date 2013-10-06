@@ -12,6 +12,10 @@ def strip_whitespace(s):
 
 class TestHTMLFragment(object):
 
+    def test_pass_text_get_text(self):
+        s = 'Whose motorcycle is this?'
+        assert unicode(HTMLFragment(s)) == s
+
     def test_pass_unwrapped_fragment_get_unwrapped_fragment(self):
         s = 'Whose motorcycle is <strong>this</strong>?'
         assert unicode(HTMLFragment(s)) == s
@@ -158,3 +162,15 @@ class TestHTMLFragment(object):
         )
         with pytest.raises(TypeError):
             s.insert(0, 42)
+
+    def test_set_unicode(self):
+        s = HTMLFragment(
+            '<strong>Vincent:</strong> Royale with cheese. '
+            '<!-- Quarter Pounder -->'
+        )
+        s[0] = u'Ž'
+        assert s[0] == u'Ž'
+        assert unicode(s) == (
+            u'<strong>Žincent:</strong> Royale with cheese. '
+            u'<!-- Quarter Pounder -->'
+        )

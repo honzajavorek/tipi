@@ -1,0 +1,3 @@
+include README* LICENSE* *requirements*.txt
+recursive-include tipi *
+global-exclude *.py[co] *~
