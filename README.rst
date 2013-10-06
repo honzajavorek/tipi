@@ -20,7 +20,7 @@ Ideas behind this project
 Alternatives
 ------------
 
-- `Typogrify <http://static.mintchaos.com/projects/typogrify/>`_
+- `Typogrify <https://github.com/mintchaos/typogrify>`_
 - `cstypo <https://github.com/yetty/cstypo>`_
 
 Plans
