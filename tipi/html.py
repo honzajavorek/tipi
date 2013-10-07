@@ -11,12 +11,24 @@ import lxml.html
 __all__ = ('HTMLFragment',)
 
 
-CharAddress = namedtuple('CharAddress', [
-    'char',
-    'element',
-    'attr',
-    'index',
-])
+class HTMLString(unicode):
+    """String with information about it's position within HTML elements."""
+
+    def __new__(cls, s, element=None):
+        s = super(HTMLString, cls).__new__(cls, s)
+        s.element = element
+        return s
+
+
+class CharAddress(namedtuple('CharAddress', 'char element attr index')):
+
+    @property
+    def parent_element(self):
+        """Provides the wrapping element of the character."""
+        el = self.element if self.attr == 'text' else self.element.getparent()
+        if el.tag == HTMLFragment._root_tag:
+            return None
+        return el
 
 
 class HTMLFragment(MutableSequence):
@@ -110,8 +122,28 @@ class HTMLFragment(MutableSequence):
         else:
             indexes = (index,)
         for index in indexes:
-            if index < 0:
+            if index is not None and index < 0:
                 raise IndexError('Negative indexes are not allowed.')
+
+    def _find_common_parent(self, elements):
+        """Finds parent common to all given HTML elements. Returns
+        :obj:`None` for the root tag or if there is no common parent.
+        """
+        parent_lists = [[el] + list(el.iterancestors()) for el in elements]
+        if not parent_lists:
+            return None
+        if len(parent_lists) == 1:
+            el = parent_lists[0][0]
+        else:
+            common = frozenset(parent_lists[0]).intersection(*parent_lists[1:])
+            if common:
+                # take the closest one
+                el = [el for el in parent_lists[0] if el in common][0]
+            else:
+                return None
+        if el.tag == self._root_tag:
+            return None
+        return el
 
     def __getitem__(self, index):
         """Provide character by it's index. Works also with slices,
@@ -119,11 +151,24 @@ class HTMLFragment(MutableSequence):
         """
         self._validate_index(index)
         if isinstance(index, slice):
-            return ''.join(
-                addr.char for addr in
-                self.addresses[index.start:index.stop]
-            )
-        return self.addresses[index].char
+            addrs = self.addresses[index.start:index.stop]
+            chars = ''.join(addr.char for addr in addrs)
+            el = self._find_common_parent(addr.element for addr in addrs)
+            return HTMLString(chars, element=el)
+
+        addr = self.addresses[index]
+        return HTMLString(addr.char, element=addr.parent_element)
+
+    def _find_pivot_addr(self, index):
+        """Inserting by slicing can lead into situation where no addresses are
+        selected. In that case a pivot address has to be chosen so we know
+        where to add characters.
+        """
+        if not self.addresses or index.start == 0:
+            return CharAddress('', self.tree, 'text', -1)  # string beginning
+        if index.start > len(self.addresses):
+            return self.addresses[-1]
+        return self.addresses[index.start]
 
     def __setitem__(self, index, value):
         """Set character to given value by it's index. Works also with
@@ -136,25 +181,28 @@ class HTMLFragment(MutableSequence):
         if isinstance(index, slice):
             # mutate the tree, first prepare changes
             addrs = self.addresses[index.start:index.stop]
+            pivot_addr = self._find_pivot_addr(index) if not addrs else None
+
             changes = {}
 
             target_size = len(addrs)
             change_size = max(len(value), target_size)
 
             for i in xrange(change_size):
-                addr = addrs[i if i < target_size else -1]
+                is_insert = (i >= target_size)
+                addr = addrs[-1 if is_insert else i] if addrs else pivot_addr
                 change_key = (addr.element, addr.attr)
 
                 chars, deleted = changes.get(
                     change_key,  # if already changed, take from mapping
-                    (list(getattr(addr.element, addr.attr)), 0)  # from tree
+                    (list(getattr(addr.element, addr.attr) or ''), 0)  # tree
                 )
 
                 c = value[i:i + 1]  # new character replacing the old one
-                if target_size < change_size and addr.index < i:
+                if is_insert:
                     # in case there is less target space than is required
                     # to store the new value, start inserting characters
-                    chars.insert(i, c)
+                    chars.insert(i - target_size + addr.index + 1, c)
                 else:
                     # overwrite characters, adjust indexing with the number
                     # of already deleted positions

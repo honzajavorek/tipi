@@ -77,11 +77,11 @@ class TestHTMLFragment(object):
             '<!-- Quarter Pounder -->'
         )
         s[21] = 'C'
-        assert s[21] == 'C'
         assert unicode(s) == (
             '<strong>Vincent:</strong> Royale with Cheese. '
             '<!-- Quarter Pounder -->'
         )
+        assert s[21] == 'C'
 
     def test_del_text_by_index(self):
         s = HTMLFragment(
@@ -89,11 +89,11 @@ class TestHTMLFragment(object):
             '<!-- Quarter Pounder -->'
         )
         del s[3]
-        assert s[3] == 'e'
         assert unicode(s) == (
             '<strong>Vinent:</strong> Royale with cheese. '
             '<!-- Quarter Pounder -->'
         )
+        assert s[3] == 'e'
 
     def test_insert_text_by_index(self):
         s = HTMLFragment(
@@ -101,11 +101,11 @@ class TestHTMLFragment(object):
             '<!-- Quarter Pounder -->'
         )
         s.insert(7, 's')
-        assert s[7] == 's'
         assert unicode(s) == (
             '<strong>Vincents:</strong> Royale with cheese. '
             '<!-- Quarter Pounder -->'
         )
+        assert s[7] == 's'
 
     def test_set_multi_chars(self):
         s = HTMLFragment(
@@ -129,11 +129,11 @@ class TestHTMLFragment(object):
             '<!-- Quarter Pounder -->'
         )
         s[0] = ''
-        assert s[0] == 'i'
         assert unicode(s) == (
             '<strong>incent:</strong> Royale with cheese. '
             '<!-- Quarter Pounder -->'
         )
+        assert s[0] == 'i'
 
     def test_insert_no_chars(self):
         s = HTMLFragment(
@@ -141,11 +141,11 @@ class TestHTMLFragment(object):
             '<!-- Quarter Pounder -->'
         )
         s.insert(0, '')
-        assert s[0] == 'V'
         assert unicode(s) == (
             '<strong>Vincent:</strong> Royale with cheese. '
             '<!-- Quarter Pounder -->'
         )
+        assert s[0] == 'V'
 
     def test_set_bad_type(self):
         s = HTMLFragment(
@@ -169,11 +169,11 @@ class TestHTMLFragment(object):
             '<!-- Quarter Pounder -->'
         )
         s[0] = u'Ž'
-        assert s[0] == u'Ž'
         assert unicode(s) == (
             u'<strong>Žincent:</strong> Royale with cheese. '
             u'<!-- Quarter Pounder -->'
         )
+        assert s[0] == u'Ž'
 
     def test_get_slice(self):
         s = HTMLFragment(
@@ -188,12 +188,87 @@ class TestHTMLFragment(object):
             '<!-- Quarter Pounder -->'
         )
         s[0:7] = 'Jules'
-        print unicode(s)
-        assert s[4] == 's' and s[5] == ':'
         assert unicode(s) == (
             '<strong>Jules:</strong> Royale with cheese. '
             '<!-- Quarter Pounder -->'
         )
+        assert s[4] == 's' and s[5] == ':'
+
+    def test_set_long_slice_with_offset(self):
+        s = HTMLFragment(
+            '<strong>Vincent:</strong> <b>Royale with</b> cheese.'
+        )
+        s[16:20] = 'without'
+        assert unicode(s) == (
+            '<strong>Vincent:</strong> <b>Royale without</b> cheese.'
+        )
+        assert s[20] == 'o'
+
+    def test_set_short_slice_between_tags(self):
+        s = HTMLFragment(
+            '<strong>Vincent:</strong> <b>Royale with</b> cheese.'
+        )
+        s[5:21] = 'Jules Jules'
+        assert unicode(s) == (
+            '<strong>VinceJul</strong>e<b>s Jules</b>cheese.'
+        )
+        assert s[5] == 'J'
+
+    def test_set_long_slice_between_tags(self):
+        s = HTMLFragment(
+            '<strong>Vincent:</strong> <b>Royale with</b> cheese.'
+        )
+        s[5:21] = 'Jules Jules Jules Jules Jules'
+        assert unicode(s) == (
+            '<strong>VinceJul</strong>e<b>s Jules Jul</b>es Jules Julescheese.'
+        )
+        assert s[5] == 'J'
+
+    def test_set_long_slice_between_tags_no_constraint(self):
+        s = HTMLFragment(
+            '<strong>Vincent:</strong> <b>Royale with</b> cheese.'
+        )
+        s[5:] = 'Jules Jules Jules Jules Jules'
+        assert unicode(s) == (
+            '<strong>VinceJul</strong>e<b>s Jules Jul</b>es Jules Jules'
+        )
+        assert s[5] == 'J'
+
+    def test_insert_slice(self):
+        s = HTMLFragment(
+            '<strong>Vincent:</strong> <b>Royale</b> with cheese.'
+        )
+        s[14:14] = ' Quarter Pounder'
+        assert unicode(s) == (
+            '<strong>Vincent:</strong> '
+            '<b>Royale Quarter Pounder</b> with cheese.'
+        )
+        assert s[16] == 'Q'
+
+    def test_insert_slice_to_end(self):
+        s = HTMLFragment(
+            '<strong>Vincent:</strong> <b>Royale</b> with cheese.'
+        )
+        s[50:] = 'Quarter Pounder'
+        assert unicode(s) == (
+            '<strong>Vincent:</strong> '
+            '<b>Royale</b> with cheese.Quarter Pounder'
+        )
+
+    def test_insert_slice_to_beginning(self):
+        s = HTMLFragment(
+            '<strong>Vincent:</strong> <b>Royale</b> with cheese.'
+        )
+        s[0:0] = 'Quarter Pounder'
+        assert unicode(s) == (
+            'Quarter Pounder<strong>Vincent:</strong> '
+            '<b>Royale</b> with cheese.'
+        )
+
+    def test_insert_slice_to_empty_string(self):
+        s = HTMLFragment('')
+        s[0:0] = 'Quarter Pounder'
+        assert unicode(s) == 'Quarter Pounder'
 
     def test_set_long_slice(self):
         s = HTMLFragment(
@@ -201,11 +276,11 @@ class TestHTMLFragment(object):
             '<!-- Quarter Pounder -->'
         )
         s[0:7] = 'Vincent to Jules'
-        assert s[11] == 'J' and s[16] == ':'
         assert unicode(s) == (
             '<strong>Vincent to Jules:</strong> Royale with cheese. '
             '<!-- Quarter Pounder -->'
         )
+        assert s[11] == 'J' and s[16] == ':'
 
     def test_del_slice(self):
         s = HTMLFragment(
@@ -213,11 +288,11 @@ class TestHTMLFragment(object):
             '<!-- Quarter Pounder -->'
         )
         del s[0:10]
-        assert s[1] == 'y'
         assert unicode(s) == (
             '<strong></strong>oyale with cheese. '
             '<!-- Quarter Pounder -->'
         )
+        assert s[1] == 'y'
 
     def test_step(self):
         s = HTMLFragment(
@@ -248,3 +323,30 @@ class TestHTMLFragment(object):
             del s[-5]
         with pytest.raises(IndexError):
             del s[0:-5]
+
+    def test_parent_element_on_item(self):
+        s = HTMLFragment('Whose motorcycle is <strong>this</strong>?')
+        assert s[0].element is None
+        assert s[21].element.tag == 'strong'
+
+    def test_parent_element_on_slice(self):
+        s = HTMLFragment('Whose <div>motorcycle is <b>this</b>?</div>')
+        assert s[0:3].element is None
+        assert s[7:10].element.tag == 'div'
+        assert s[21:22].element.tag == 'b'
+        assert s[7:21].element.tag == 'div'
+        assert s[0:50].element is None
+
+    def test_get_slice_from_empty_string(self):
+        s = HTMLFragment('')
+        assert s[0:5] == ''
+
+    def test_set_slice_to_empty_string(self):
+        s = HTMLFragment('')
+        s[0:5] = 'Fabienne'
+        assert unicode(s) == 'Fabienne'
+
+    def test_del_slice_to_empty_string(self):
+        s = HTMLFragment('')
+        del s[0:5]
+        assert unicode(s) == ''

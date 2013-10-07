@@ -21,9 +21,15 @@ def replace(html, patterns=None):
     for pattern in patterns:
         def replace(match):
             repl = match.expand(pattern[1])
+            print match.group(0), pattern[1]
+            print repr(html[match.start():match.end()]), repr(repl)
             html[match.start():match.end()] = repl  # mutates html
             return repl
-        text = pattern[0].sub(replace, text)
+
+        while True:
+            text, n = pattern[0].subn(replace, text, count=1)
+            if not n:
+                break
 
     return unicode(html)
 

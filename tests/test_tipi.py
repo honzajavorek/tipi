@@ -31,3 +31,42 @@ class TestReplace(object):
             (u'Whose\u00a0<strong class="vehicle">motor-cycle'
              u'</strong>\u00a0is\u00a0this?')
         )
+
+    def test_replace_everywhere(self):
+        s = 'Whose <strong>motorcycle</strong> motorcycle is this?'
+        patterns = (
+            (re.compile(r'motorcycle'), ur'motor-cycle'),
+        )
+        assert (
+            replace(s, patterns)
+            ==
+            ('Whose <strong>motor-cycle</strong> motor-cycle is this?')
+        )
+
+    def test_replace_inside_given_tags_only(self):
+        s = 'Whose <strong><b>motorcycle</b></strong> motorcycle is this?'
+        patterns = (
+            (re.compile(r'motorcycle'), ur'motor-cycle', ['strong']),
+        )
+        assert (
+            replace(s, patterns)
+            ==
+            ('Whose <strong><b>motor-cycle</b></strong> motorcycle is this?')
+        )
+
+    def test_replace_outside_given_tags_only(self):
+        s = (
+            'Whose <strong><b>motorcycle</b></strong> '
+            '<b>motorcycle</b> is this?'
+        )
+        patterns = (
+            (re.compile(r'motorcycle'), ur'motor-cycle', ['-strong']),
+        )
+        assert (
+            replace(s, patterns)
+            ==
+            (
+                'Whose <strong><b>motorcycle</b></strong> '
+                '<b>motor-cycle</b> is this?'
+            )
+        )
