@@ -41,7 +41,7 @@ class HTMLFragment(MutableSequence):
         self.string = html
         self.has_body = False
         self.tree = self._parse(html)
-        self.adresses = self._analyze(self.tree)
+        self.addresses = self._analyze_tree(self.tree)
 
     def _parse(self, html):
         """Parse given string as HTML and return it's etree representation."""
@@ -61,11 +61,11 @@ class HTMLFragment(MutableSequence):
             return root
         return tree
 
-    def _analyze(self, tree):  # NOQA
+    def _analyze_tree(self, tree):  # NOQA
         """Analyze given tree and create mapping of indexes to character
-        adresses.
+        addresses.
         """
-        adresses = []
+        addresses = []
         for el in self.tree.iter():
             if self._is_not_relevant(el):
                 texts = [(el.tail, 'tail')]
@@ -78,15 +78,15 @@ class HTMLFragment(MutableSequence):
                 for i, char in enumerate(text):
                     if char in whitespace:
                         char = ' '
-                    adresses.append(CharAddress(char, el, attr, i))
+                    addresses.append(CharAddress(char, el, attr, i))
 
         # remove leading and trailing whitespace
-        while adresses and adresses[0].char == ' ':
-            del adresses[0]
-        while adresses and adresses[-1].char == ' ':
-            del adresses[-1]
+        while addresses and addresses[0].char == ' ':
+            del addresses[0]
+        while addresses and addresses[-1].char == ' ':
+            del addresses[-1]
 
-        return adresses
+        return addresses
 
     def _is_not_relevant(self, el):
         """Tell about given element whether it's contents should be exposed
@@ -99,56 +99,113 @@ class HTMLFragment(MutableSequence):
 
     def __iter__(self):
         """Iterate over characters, one by one."""
-        return iter(addr.char for addr in self.adresses)
+        return iter(addr.char for addr in self.addresses)
+
+    def _validate_index(self, index):
+        """Validates given index, eventually raises errors."""
+        if isinstance(index, slice):
+            if index.step and index.step != 1:
+                raise IndexError('Step is not allowed.')
+            indexes = (index.start, index.stop)
+        else:
+            indexes = (index,)
+        for index in indexes:
+            if index < 0:
+                raise IndexError('Negative indexes are not allowed.')
 
     def __getitem__(self, index):
-        """Provide character by it's index."""
-        return self.adresses[index].char
-
-    def _mutate_tree(self, index, fn):
-        addr = self.adresses[index]
-        chars = list(getattr(addr.element, addr.attr))
-        fn(chars, addr)
-        setattr(addr.element, addr.attr, ''.join(chars))
+        """Provide character by it's index. Works also with slices,
+        but step is not implemented.
+        """
+        self._validate_index(index)
+        if isinstance(index, slice):
+            return ''.join(
+                addr.char for addr in
+                self.addresses[index.start:index.stop]
+            )
+        return self.addresses[index].char
 
     def __setitem__(self, index, value):
-        """Set character to given value by it's index."""
+        """Set character to given value by it's index. Works also with
+        slices, but step is not implemented.
+        """
+        self._validate_index(index)
         if not isinstance(value, basestring):
-            raise TypeError('Only character can be set.')
-        if len(value) == 0:
-            return self.__delitem__(index)
-        if len(value) != 1:
-            raise ValueError('Only single character can be set.')
+            raise TypeError('Only characters can be set.')
 
-        def set_item(chars, addr):
+        if isinstance(index, slice):
+            # mutate the tree, first prepare changes
+            addrs = self.addresses[index.start:index.stop]
+            changes = {}
+
+            target_size = len(addrs)
+            change_size = max(len(value), target_size)
+
+            for i in xrange(change_size):
+                addr = addrs[i if i < target_size else -1]
+                change_key = (addr.element, addr.attr)
+
+                chars, deleted = changes.get(
+                    change_key,  # if already changed, take from mapping
+                    (list(getattr(addr.element, addr.attr)), 0)  # from tree
+                )
+
+                c = value[i:i + 1]  # new character replacing the old one
+                if target_size < change_size and addr.index < i:
+                    # in case there is less target space than is required
+                    # to store the new value, start inserting characters
+                    chars.insert(i, c)
+                else:
+                    # overwrite characters, adjust indexing with the number
+                    # of already deleted positions
+                    chars[addr.index - deleted:addr.index - deleted + 1] = c
+
+                if not c:
+                    # count deleted positions in this particular character set
+                    deleted += 1
+                changes[change_key] = (chars, deleted)
+
+            # record to tree, all changes at once
+            for (el, attr), (chars, deleted) in changes.items():
+                setattr(el, attr, ''.join(chars))
+        else:
+            if len(value) > 1:
+                raise ValueError('Only single character can be set.')
+
+            # mutate the tree
+            addr = self.addresses[index]
+            chars = list(getattr(addr.element, addr.attr))
             chars[addr.index] = value
-            self.adresses[index] = CharAddress(value, *addr[1:])
+            setattr(addr.element, addr.attr, ''.join(chars))
 
-        self._mutate_tree(index, set_item)
+        # re-analyze the tree
+        self.addresses = self._analyze_tree(self.tree)
 
     def __delitem__(self, index):
-        def del_item(chars, addr):
-            del chars[addr.index]
-
-        self._mutate_tree(index, del_item)
-        self.adresses = self._analyze(self.tree)
+        """Set character to empty string by it's index. Works also with
+        slices, but step is not implemented.
+        """
+        self.__setitem__(index, '')
 
     def __len__(self):
         return len(self.addresses)
 
     def insert(self, index, value):
         if not isinstance(value, basestring):
-            raise TypeError('Only character can be inserted.')
+            raise TypeError('Only characters can be inserted.')
         if len(value) == 0:
             return
         if len(value) != 1:
             raise ValueError('Only single character can be inserted.')
 
-        def insert_item(chars, addr):
-            chars.insert(addr.index, value)
+        # mutate the tree
+        addr = self.addresses[index]
+        chars = list(getattr(addr.element, addr.attr))
+        chars.insert(addr.index, value)
+        setattr(addr.element, addr.attr, ''.join(chars))
 
-        self._mutate_tree(index, insert_item)
-        self.adresses = self._analyze(self.tree)
+        # re-analyze the tree
+        self.addresses = self._analyze_tree(self.tree)
 
     def text(self):
         return ''.join(list(self))

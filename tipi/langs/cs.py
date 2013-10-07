@@ -138,15 +138,15 @@ patterns = (
     (
         re.compile(
             (ur'(?<= |\.|,|-|\+|\x16|\()([\x17-\x1F]*\d+\.?[\x17-\x1F]*)\s+'
-             ur'(?=[\x17-\x1F]*[%{0}\u00B0-\u00be\u2020-\u214f])'.format(ch)),
+             ur'(?=[\x17-\x1F]*[%{0}\u00B0-\u00be\u2020-\u214f])').format(ch),
             re.M | re.U
         ),
         ur'\1\u00a0',
-    )
+    ),
     (
         re.compile(
             (ur'(?<=\d\u00A0)([\x17-\x1F]*\d+\.?[\x17-\x1F]*)\s+'
-             ur'(?=[\x17-\x1F]*[%{0}\u00B0-\u00be\u2020-\u214f])'.format(ch)),
+             ur'(?=[\x17-\x1F]*[%{0}\u00B0-\u00be\u2020-\u214f])').format(ch),
             re.M | re.U
         ),
         ur'\1\u00a0'

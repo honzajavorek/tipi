@@ -174,3 +174,77 @@ class TestHTMLFragment(object):
             u'<strong>Žincent:</strong> Royale with cheese. '
             u'<!-- Quarter Pounder -->'
         )
+
+    def test_get_slice(self):
+        s = HTMLFragment(
+            '<strong>Vincent:</strong> Royale with cheese. '
+            '<!-- Quarter Pounder -->'
+        )
+        assert s[3:10] == 'cent: R'
+
+    def test_set_short_slice(self):
+        s = HTMLFragment(
+            '<strong>Vincent:</strong> Royale with cheese. '
+            '<!-- Quarter Pounder -->'
+        )
+        s[0:7] = 'Jules'
+        print unicode(s)
+        assert s[4] == 's' and s[5] == ':'
+        assert unicode(s) == (
+            '<strong>Jules:</strong> Royale with cheese. '
+            '<!-- Quarter Pounder -->'
+        )
+
+    def test_set_long_slice(self):
+        s = HTMLFragment(
+            '<strong>Vincent:</strong> Royale with cheese. '
+            '<!-- Quarter Pounder -->'
+        )
+        s[0:7] = 'Vincent to Jules'
+        assert s[11] == 'J' and s[16] == ':'
+        assert unicode(s) == (
+            '<strong>Vincent to Jules:</strong> Royale with cheese. '
+            '<!-- Quarter Pounder -->'
+        )
+
+    def test_del_slice(self):
+        s = HTMLFragment(
+            '<strong>Vincent:</strong> Royale with cheese. '
+            '<!-- Quarter Pounder -->'
+        )
+        del s[0:10]
+        assert s[1] == 'y'
+        assert unicode(s) == (
+            '<strong></strong>oyale with cheese. '
+            '<!-- Quarter Pounder -->'
+        )
+
+    def test_step(self):
+        s = HTMLFragment(
+            '<strong>Vincent:</strong> Royale with cheese. '
+            '<!-- Quarter Pounder -->'
+        )
+        with pytest.raises(IndexError):
+            s[0:5:2]
+        with pytest.raises(IndexError):
+            s[0:5:2] = 'Jules'
+        with pytest.raises(IndexError):
+            del s[0:5:2]
+
+    def test_negative_index(self):
+        s = HTMLFragment(
+            '<strong>Vincent:</strong> Royale with cheese. '
+            '<!-- Quarter Pounder -->'
+        )
+        with pytest.raises(IndexError):
+            s[-5]
+        with pytest.raises(IndexError):
+            s[0:-5]
+        with pytest.raises(IndexError):
+            s[-5] = 'a'
+        with pytest.raises(IndexError):
+            s[0:-5] = 'Jules'
+        with pytest.raises(IndexError):
+            del s[-5]
+        with pytest.raises(IndexError):
+            del s[0:-5]
