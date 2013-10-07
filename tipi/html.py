@@ -12,23 +12,39 @@ __all__ = ('HTMLFragment',)
 
 
 class HTMLString(unicode):
-    """String with information about it's position within HTML elements."""
+    """String with information about parent HTML elements."""
 
-    def __new__(cls, s, element=None):
-        s = super(HTMLString, cls).__new__(cls, s)
-        s.element = element
+    def __new__(cls, addresses):
+        chars = ''.join(addr.char for addr in addresses)
+        s = super(HTMLString, cls).__new__(cls, chars)
+        s._addresses = addresses
+        s._parents = None
         return s
 
-
-class CharAddress(namedtuple('CharAddress', 'char element attr index')):
+    @property
+    def parents(self):
+        """Provides all parent HTML elements."""
+        if self._parents is None:
+            parents = set()
+            for addr in self._addresses:
+                if addr.attr == 'text':
+                    parents.add(addr.element)
+                parents.update(addr.element.iterancestors())
+            self._parents = frozenset(
+                p for p in parents if p.tag != HTMLFragment._root_tag
+            )
+        return self._parents
 
     @property
-    def parent_element(self):
-        """Provides the wrapping element of the character."""
-        el = self.element if self.attr == 'text' else self.element.getparent()
-        if el.tag == HTMLFragment._root_tag:
-            return None
-        return el
+    def parent_tags(self):
+        """Provides tags of all parent HTML elements."""
+        return frozenset(p.tag for p in self.parents)
+
+
+Text = namedtuple('TextAddress', 'content element attr')
+
+
+CharAddress = namedtuple('CharAddress', 'char element attr index')
 
 
 class HTMLFragment(MutableSequence):
@@ -47,7 +63,7 @@ class HTMLFragment(MutableSequence):
     _has_body_re = re.compile(r'<body', re.I)
     _body_re = re.compile(r'<body[^>]+>.*</body>', re.I | re.S)
 
-    not_relevant_tags = ['style', 'script']
+    skipped_tags = ['style', 'script']
 
     def __init__(self, html):
         self.string = html
@@ -73,24 +89,32 @@ class HTMLFragment(MutableSequence):
             return root
         return tree
 
-    def _analyze_tree(self, tree):  # NOQA
+    def _iter_texts(self, tree):
+        """Iterates over texts in given HTML tree."""
+        skip = (
+            not isinstance(tree, lxml.html.HtmlElement)  # comments, etc.
+            or tree.tag in self.skipped_tags
+        )
+        if not skip:
+            if tree.text:
+                yield Text(tree.text, tree, 'text')
+            for child in tree:
+                for text in self._iter_texts(child):
+                    yield text
+        if tree.tail:
+            yield Text(tree.tail, tree, 'tail')
+
+    def _analyze_tree(self, tree):
         """Analyze given tree and create mapping of indexes to character
         addresses.
         """
         addresses = []
-        for el in self.tree.iter():
-            if self._is_not_relevant(el):
-                texts = [(el.tail, 'tail')]
-            else:
-                texts = [(el.text, 'text'), (el.tail, 'tail')]
-
-            for text, attr in texts:
-                if not text:
-                    continue
-                for i, char in enumerate(text):
-                    if char in whitespace:
-                        char = ' '
-                    addresses.append(CharAddress(char, el, attr, i))
+        for text in self._iter_texts(tree):
+            print text
+            for i, char in enumerate(text.content):
+                if char in whitespace:
+                    char = ' '
+                addresses.append(CharAddress(char, text.element, text.attr, i))
 
         # remove leading and trailing whitespace
         while addresses and addresses[0].char == ' ':
@@ -99,15 +123,6 @@ class HTMLFragment(MutableSequence):
             del addresses[-1]
 
         return addresses
-
-    def _is_not_relevant(self, el):
-        """Tell about given element whether it's contents should be exposed
-        in the sequence of characters.
-        """
-        return (
-            not isinstance(el, lxml.html.HtmlElement)  # comments, etc.
-            or el.tag in self.not_relevant_tags
-        )
 
     def __iter__(self):
         """Iterate over characters, one by one."""
@@ -125,39 +140,14 @@ class HTMLFragment(MutableSequence):
             if index is not None and index < 0:
                 raise IndexError('Negative indexes are not allowed.')
 
-    def _find_common_parent(self, elements):
-        """Finds parent common to all given HTML elements. Returns
-        :obj:`None` for the root tag or if there is no common parent.
-        """
-        parent_lists = [[el] + list(el.iterancestors()) for el in elements]
-        if not parent_lists:
-            return None
-        if len(parent_lists) == 1:
-            el = parent_lists[0][0]
-        else:
-            common = frozenset(parent_lists[0]).intersection(*parent_lists[1:])
-            if common:
-                # take the closest one
-                el = [el for el in parent_lists[0] if el in common][0]
-            else:
-                return None
-        if el.tag == self._root_tag:
-            return None
-        return el
-
     def __getitem__(self, index):
         """Provide character by it's index. Works also with slices,
         but step is not implemented.
         """
         self._validate_index(index)
         if isinstance(index, slice):
-            addrs = self.addresses[index.start:index.stop]
-            chars = ''.join(addr.char for addr in addrs)
-            el = self._find_common_parent(addr.element for addr in addrs)
-            return HTMLString(chars, element=el)
-
-        addr = self.addresses[index]
-        return HTMLString(addr.char, element=addr.parent_element)
+            return HTMLString(self.addresses[index.start:index.stop])
+        return HTMLString([self.addresses[index]])
 
     def _find_pivot_addr(self, index):
         """Inserting by slicing can lead into situation where no addresses are

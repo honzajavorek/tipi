@@ -24,6 +24,10 @@ class TestHTMLFragment(object):
         s = '<p>Whose motorcycle is <strong>this</strong>?</p>'
         assert unicode(HTMLFragment(s)) == s
 
+    def test_pass_nested_tags_get_nested_tags(self):
+        s = 'Whose <strong><b>motorcycle</b></strong> is this?'
+        assert unicode(HTMLFragment(s)) == s
+
     def test_pass_document_get_document(self):
         s = '''
         <!DOCTYPE html>
@@ -66,10 +70,15 @@ class TestHTMLFragment(object):
         assert s[0] == 'T'
         assert s[31] == 'T'
         assert s[36] == 's'
-        assert s[53] == ' '
-        assert s[58] == 't'
-        assert s[93] == 'I'
-        assert s[110] == 't'
+        assert s[52] == ' '
+        assert s[84] == 'I'
+        assert s[101] == 't'
+
+    def test_get_text_from_nested_tags(self):
+        s = HTMLFragment('Whose <div><i><b>motorcycle</b></i> is this?</div>')
+        assert s[0:5] == 'Whose'
+        assert s[6:16] == 'motorcycle'
+        assert s[20:24] == 'this'
 
     def test_set_text_by_index(self):
         s = HTMLFragment(
@@ -326,16 +335,16 @@ class TestHTMLFragment(object):
 
     def test_parent_element_on_item(self):
         s = HTMLFragment('Whose motorcycle is <strong>this</strong>?')
-        assert s[0].element is None
-        assert s[21].element.tag == 'strong'
+        assert s[0].parents == frozenset()
+        assert s[21].parent_tags == frozenset(['strong'])
 
     def test_parent_element_on_slice(self):
         s = HTMLFragment('Whose <div>motorcycle is <b>this</b>?</div>')
-        assert s[0:3].element is None
-        assert s[7:10].element.tag == 'div'
-        assert s[21:22].element.tag == 'b'
-        assert s[7:21].element.tag == 'div'
-        assert s[0:50].element is None
+        assert s[0:3].parents == frozenset()
+        assert s[7:10].parent_tags == frozenset(['div'])
+        assert s[21:22].parent_tags == frozenset(['div', 'b'])
+        assert s[7:21].parent_tags == frozenset(['div', 'b'])
+        assert s[0:50].parent_tags == frozenset(['div', 'b'])
 
     def test_get_slice_from_empty_string(self):
         s = HTMLFragment('')

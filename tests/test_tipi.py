@@ -3,7 +3,7 @@
 
 import re
 
-from tipi.tipi import replace
+from tipi.tipi import Replacer
 
 
 class TestReplace(object):
@@ -14,7 +14,7 @@ class TestReplace(object):
             (re.compile(r'(motorcycle) (is)'), ur'\1\u00a0\2'),
         )
         assert (
-            replace(s, patterns)
+            Replacer().replace(s, patterns)
             ==
             u'Whose <strong class="vehicle">motorcycle</strong>\u00a0is this?'
         )
@@ -26,7 +26,7 @@ class TestReplace(object):
             (re.compile(r' '), ur'\u00a0'),
         )
         assert (
-            replace(s, patterns)
+            Replacer().replace(s, patterns)
             ==
             (u'Whose\u00a0<strong class="vehicle">motor-cycle'
              u'</strong>\u00a0is\u00a0this?')
@@ -38,20 +38,20 @@ class TestReplace(object):
             (re.compile(r'motorcycle'), ur'motor-cycle'),
         )
         assert (
-            replace(s, patterns)
+            Replacer().replace(s, patterns)
             ==
             ('Whose <strong>motor-cycle</strong> motor-cycle is this?')
         )
 
     def test_replace_inside_given_tags_only(self):
-        s = 'Whose <strong><b>motorcycle</b></strong> motorcycle is this?'
+        s = 'Whose <strong>motorcycle</strong> motorcycle is this?'
         patterns = (
             (re.compile(r'motorcycle'), ur'motor-cycle', ['strong']),
         )
         assert (
-            replace(s, patterns)
+            Replacer().replace(s, patterns)
             ==
-            ('Whose <strong><b>motor-cycle</b></strong> motorcycle is this?')
+            ('Whose <strong>motor-cycle</strong> motorcycle is this?')
         )
 
     def test_replace_outside_given_tags_only(self):
@@ -63,7 +63,7 @@ class TestReplace(object):
             (re.compile(r'motorcycle'), ur'motor-cycle', ['-strong']),
         )
         assert (
-            replace(s, patterns)
+            Replacer().replace(s, patterns)
             ==
             (
                 'Whose <strong><b>motorcycle</b></strong> '
