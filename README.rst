@@ -20,8 +20,8 @@ Ideas behind this project
 Alternatives
 ------------
 
-- `Typogrify <https://github.com/mintchaos/typogrify>`_
-- `cstypo <https://github.com/yetty/cstypo>`_
+- `Typogrify <https://github.com/mintchaos/typogrify>`_ - English only, adds markup for styling, on top of `smartypants <http://web.chad.org/projects/smartypants.py/>_`
+- `cstypo <https://github.com/yetty/cstypo>`_ - Czech only, not working well with HTML
 
 Plans
 -----
