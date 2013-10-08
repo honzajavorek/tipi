@@ -2,7 +2,10 @@
 Tipi
 ====
 
-Tipi will be a tool for converting plain ASCII punctuation characters into HTML entities according to basic typography rules.
+.. image:: https://travis-ci.org/honzajavorek/tipi.png
+   :target: https://travis-ci.org/honzajavorek/tipi
+
+Tipi is a tool for converting plain ASCII punctuation characters into HTML entities according to basic typography rules.
 
 Status: ACTIVE
 --------------
