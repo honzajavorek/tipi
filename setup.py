@@ -50,9 +50,12 @@ setup(
     zip_safe=False,
     classifiers=(
         'Development Status :: 4 - Beta',
+        'Environment :: Web Environment',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
+        'Operating System :: OS Independent',
+        'Topic :: Utilities',
         'Topic :: Text Processing',
         'Topic :: Text Processing :: Markup :: HTML',
     )
