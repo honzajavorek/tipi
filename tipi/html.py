@@ -110,7 +110,6 @@ class HTMLFragment(MutableSequence):
         """
         addresses = []
         for text in self._iter_texts(tree):
-            print text
             for i, char in enumerate(text.content):
                 if char in whitespace:
                     char = ' '

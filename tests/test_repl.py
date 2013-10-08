@@ -3,30 +3,30 @@
 
 import re
 
-from tipi.tipi import Replacer
+from tipi.repl import Replacement, replace
 
 
 class TestReplace(object):
 
     def test_simple_replace(self):
         s = 'Whose <strong class="vehicle">motorcycle</strong> is this?'
-        patterns = (
-            (re.compile(r'(motorcycle) (is)'), ur'\1\u00a0\2'),
+        replacements = (
+            Replacement(re.compile(r'(motorcycle) (is)'), ur'\1\u00a0\2'),
         )
         assert (
-            Replacer().replace(s, patterns)
+            replace(s, replacements)
             ==
             u'Whose <strong class="vehicle">motorcycle</strong>\u00a0is this?'
         )
 
     def test_multiple_replace(self):
         s = 'Whose <strong class="vehicle">motorcycle</strong> is this?'
-        patterns = (
-            (re.compile(r'motorcycle'), ur'motor-cycle'),
-            (re.compile(r' '), ur'\u00a0'),
+        replacements = (
+            Replacement(re.compile(r'motorcycle'), ur'motor-cycle'),
+            Replacement(re.compile(r' '), ur'\u00a0'),
         )
         assert (
-            Replacer().replace(s, patterns)
+            replace(s, replacements)
             ==
             (u'Whose\u00a0<strong class="vehicle">motor-cycle'
              u'</strong>\u00a0is\u00a0this?')
@@ -34,39 +34,39 @@ class TestReplace(object):
 
     def test_replace_everywhere(self):
         s = 'Whose <strong>motorcycle</strong> motorcycle is this?'
-        patterns = (
-            (re.compile(r'motorcycle'), ur'motor-cycle'),
+        replacements = (
+            Replacement(re.compile(r'motorcycle'), ur'motor-cycle'),
         )
         assert (
-            Replacer().replace(s, patterns)
+            replace(s, replacements)
             ==
             ('Whose <strong>motor-cycle</strong> motor-cycle is this?')
         )
 
     def test_replace_inside_given_tags_only(self):
-        s = 'Whose <strong>motorcycle</strong> motorcycle is this?'
-        patterns = (
-            (re.compile(r'motorcycle'), ur'motor-cycle', ['strong']),
+        s = 'Whose <b>motorcycle</b> motorcycle is this?'
+        replacements = (
+            Replacement(re.compile(r'motorcycle'), ur'motor-cycle', ['b']),
         )
         assert (
-            Replacer().replace(s, patterns)
+            replace(s, replacements)
             ==
-            ('Whose <strong>motor-cycle</strong> motorcycle is this?')
+            ('Whose <b>motor-cycle</b> motorcycle is this?')
         )
 
     def test_replace_outside_given_tags_only(self):
         s = (
-            'Whose <strong><b>motorcycle</b></strong> '
+            'Whose <i><b>motorcycle</b></i> '
             '<b>motorcycle</b> is this?'
         )
-        patterns = (
-            (re.compile(r'motorcycle'), ur'motor-cycle', ['-strong']),
+        replacements = (
+            Replacement(re.compile(r'motorcycle'), ur'motor-cycle', ['-i']),
         )
         assert (
-            Replacer().replace(s, patterns)
+            replace(s, replacements)
             ==
             (
-                'Whose <strong><b>motorcycle</b></strong> '
+                'Whose <i><b>motorcycle</b></i> '
                 '<b>motor-cycle</b> is this?'
             )
         )

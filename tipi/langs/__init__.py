@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*- #
 
 
+import warnings
+
+from tipi.repl import Replacement
+
+
 __all__ = ('langs',)
 
 
@@ -9,7 +14,7 @@ class MissingLanguageError(LookupError):
 
 
 class LangsLoader(object):
-    """Dynamically loads replacement patterns for given languages."""
+    """Dynamically loads replacements for given languages."""
 
     def __init__(self):
         self._langs = {}
@@ -20,20 +25,23 @@ class LangsLoader(object):
         except ImportError:
             raise MissingLanguageError
         try:
-            return lang.patterns
+            return [Replacement(*args) for args in lang.replacements]
         except AttributeError:
             raise MissingLanguageError
 
     def __getitem__(self, lang):
-        """Returns list of patterns for given language."""
+        """Returns list of replacements for given language."""
         if lang not in self._langs:
             try:
                 self._langs[lang] = self._load(lang)
             except MissingLanguageError:
-                pass  # TODO python warning
+                warnings.warn(
+                    "No such language available: '{0}'".format(lang),
+                    ImportWarning
+                )
         return self._langs.get(lang, [])
 
 
-#! Repository of replacement patterns for available languages.
+#! Repository of replacements for available languages.
 #! For missing languages silently returns empty lists.
 langs = LangsLoader()

@@ -4,9 +4,9 @@
 import re
 
 
-__all__ = ('patterns',)
+__all__ = ('replacements',)
 
 
-patterns = (
+replacements = (
 
 )

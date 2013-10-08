@@ -1,22 +1,24 @@
 # -*- coding: utf-8 -*-
 
 
-from .langs import langs
-from .html import HTMLFragment
+from tipi.html import HTMLFragment
 
 
-__all__ = ('tipi',)
+__all__ = ('Replacement', 'replace')
 
 
-class PatternReplacer(object):
+class Replacement(object):
+    """Replacement representation."""
 
-    def __init__(self, html, pattern, replacement, filters=None):
-        self.html = html
+    def __init__(self, pattern, replacement, filters=None):
         self.pattern = pattern
         self.replacement = replacement
         self.filters = self._parse_filters(filters)
 
     def _parse_filters(self, filters):
+        """Parses filter definitions. Returns list of functions,
+        each of them
+        """
         if not filters:
             return []
 
@@ -38,8 +40,10 @@ class PatternReplacer(object):
                 funcs.append(f)  # filter by custom function
         return funcs
 
-    def replace(self):
-        text = self.html.text()
+    def replace(self, html):
+        """Perform replacements on given HTML fragment."""
+        self.html = html
+        text = html.text()
         positions = []
 
         def perform_replacement(match):
@@ -65,28 +69,15 @@ class PatternReplacer(object):
                 break
 
 
-class Replacer(object):
-    """Performs replacements on given HTML string with given patterns.
-    No replacements take place in case no patterns are given.
+def replace(html, replacements=None):
+    """Performs replacements on given HTML string with given replacements.
+    No replacements take place in case no replacements are given.
     """
+    if not replacements:
+        return html  # no replacements
+    html = HTMLFragment(html)
 
-    html_fragment_cls = HTMLFragment
+    for r in replacements:
+        r.replace(html)
 
-    def replace(self, html, patterns=None):
-        if not patterns:
-            return html  # no replacements
-
-        html = self.html_fragment_cls(html)
-        self.html = html
-
-        for p in patterns:
-            PatternReplacer(html, *p).replace()
-
-        return unicode(self.html)
-
-
-def tipi(html, lang='en'):
-    """Performs language-sensitive typographic replacements on given HTML
-    string. No replacements take place in case of unknown language.
-    """
-    return Replacer().replace(html, patterns=langs[lang])
+    return unicode(html)

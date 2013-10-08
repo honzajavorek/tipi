@@ -4,12 +4,12 @@
 import re
 
 
-__all__ = ('patterns',)
+__all__ = ('replacements',)
 
 
 ch = ur'A-Za-z\u00C0-\u02FF\u0370-\u1EFF'
 
-patterns = (
+replacements = (
     # ellipsis ...
     (
         re.compile(ur'(?<![.\u2026])\.{3,4}(?![.\u2026])', re.M | re.U),
