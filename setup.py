@@ -38,7 +38,6 @@ setup(
         'Converting plain ASCII punctuation characters into HTML '
         'entities according to basic typography rules'
     ),
-    long_description=open('README.rst').read(),
     author=meta['author'],
     author_email='mail@honzajavorek.cz',
     url='https://github.com/honzajavorek/tipi',
