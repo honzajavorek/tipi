@@ -23,6 +23,8 @@ Ideas behind this project
 Quickstart
 ----------
 
+Usage of tipi is very straightforward::
+
     >>> from tipi import tipi
     >>> html = tipi('<p>"Zavolej mi na číslo <strong class="tel">765-876-888</strong>," řekla, a zmizela...</p>"', lang='cs')
     >>> html
