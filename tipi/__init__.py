@@ -19,4 +19,4 @@ def tipi(html, lang='en'):
     """Performs language-sensitive typographic replacements on given HTML
     string. No replacements take place in case of unknown language.
     """
-    return replace(html, patterns=langs[lang])
+    return replace(html, replacements=langs[lang])

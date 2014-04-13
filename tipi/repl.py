@@ -63,16 +63,14 @@ class Replacement(object):
         while True:
             if positions:
                 text = text[positions[-1]:]
-            print repr(text)
+
             text, n = self.pattern.subn(perform_replacement, text, count=1)
             if not n:  # all is already replaced
                 break
 
 
 def replace(html, replacements=None):
-    """Performs replacements on given HTML string with given replacements.
-    No replacements take place in case no replacements are given.
-    """
+    """Performs replacements on given HTML string."""
     if not replacements:
         return html  # no replacements
     html = HTMLFragment(html)
