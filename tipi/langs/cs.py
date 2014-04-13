@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*- #
 
+"""
+Czech typography
+
+Most regular expressions inspired by
+`texytypo.py <https://gist.github.com/msgre/3805872>`, which is Python port
+of typography rules from `Texy! <https://github.com/dg/texy/>`_ project.
+"""
+
 
 import re
 
