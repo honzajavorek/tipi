@@ -26,7 +26,8 @@ Quickstart
 Usage of tipi is very straightforward::
 
     >>> from tipi import tipi
-    >>> html = tipi('<p>"Zavolej mi na číslo <strong class="tel">765-876-888</strong>," řekla, a zmizela...</p>"', lang='cs')
+    >>> html = '<p>"Zavolej mi na číslo <strong class="tel">765-876-888</strong>," řekla, a zmizela...</p>"'
+    >>> html = tipi(html, lang='cs')
     >>> html
     u'<p>\u201eZavolej mi na \u010d\xed\xadslo <strong class="tel">765\u2013876\u2013888</strong>,\u201c \u0159ekla, a\xa0zmizela\u2026</p>'
     >>> print html
