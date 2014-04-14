@@ -12,12 +12,12 @@ def test_unicode():
     assert tipi(u'řeřicha', 'cs') == u'řeřicha'
 
     s = (
-        '<p>"Zavolej mi na číslo <strong class="tel">765-876-888</strong>," '
-        'řekla, a zmizela...</p>"'
+        u'<p>"Zavolej mi na číslo <strong class="tel">765-876-888</strong>," '
+        u'řekla, a zmizela...</p>'
     )
     assert tipi(s, lang='cs') == (
-        '<p>„Zavolej mi na čí­slo <strong class="tel">765–876–888</strong>,“ '
-        'řekla, a zmizela…</p>'
+        u'<p>„Zavolej mi na číslo <strong class="tel">765–876–888</strong>,“ '
+        u'řekla, a zmizela…</p>'
     )
 
 
