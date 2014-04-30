@@ -51,6 +51,15 @@ Remember that tipi is designed to work with HTML. In case you need to perform re
     >>> tipi(html)
     u'a ← b → c'
 
+Features
+--------
+
+- Support for multiple languages.
+- Language-sensitive replacements for single quotes and double quotes.
+- Ellipsis, dashes, nonbreakable spaces, ...
+- Arrows (--> turned into → ), dimensions (12 × 30).
+- Symbols (trademark, registered, copyright, EUR, ...)
+
 Alternatives
 ------------
 
