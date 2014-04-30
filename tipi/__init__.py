@@ -12,7 +12,7 @@ from tipi.langs import langs
 from tipi.repl import replace
 
 
-__all__ = ('tipi', 'plaintext')
+__all__ = ('tipi',)
 
 
 def tipi(html, lang='en'):
