@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 
+from functools import partial
+
 from tipi.html import HTMLFragment
 
 
@@ -10,9 +12,14 @@ __all__ = ('Replacement', 'replace')
 class Replacement(object):
     """Replacement representation."""
 
+    default_filters = ['-code', '-kbd', '-pre', '-samp', '-script',
+                       '-style', '-tt']
+
     def __init__(self, pattern, replacement, filters=None):
         self.pattern = pattern
         self.replacement = replacement
+
+        filters = (filters or []) + self.default_filters
         self.filters = self._parse_filters(filters)
 
     def _parse_filters(self, filters):
@@ -26,14 +33,16 @@ class Replacement(object):
                 # filter by tag name
                 if f.startswith('-'):
                     # replace only if not within this tag
-                    funcs.append(
-                        lambda s: f[1:] not in s.parent_tags
-                    )
+                    funcs.append(partial(
+                        lambda tag, s: tag not in s.parent_tags,
+                        f[1:]
+                    ))
                 else:
                     # replace only within this tag
-                    funcs.append(
-                        lambda s: f in s.parent_tags
-                    )
+                    funcs.append(partial(
+                        lambda tag, s: tag in s.parent_tags,
+                        f
+                    ))
             else:
                 funcs.append(f)  # filter by custom function
         return funcs
