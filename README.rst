@@ -23,7 +23,9 @@ Ideas behind this project
 Quickstart
 ----------
 
-Usage of tipi is very straightforward::
+Usage of tipi is very straightforward:
+
+.. code-block:: python
 
     >>> from tipi import tipi
     >>> html = '<p>"Zavolej mi na číslo <strong class="tel">765-876-888</strong>," řekla, a zmizela...</p>"'
@@ -33,7 +35,9 @@ Usage of tipi is very straightforward::
     >>> print html
     <p>„Zavolej mi na čí­slo <strong class="tel">765–876–888</strong>,“ řekla, a zmizela…</p>
 
-Remember that tipi is designed to work with HTML. In case you need to perform replacements on plaintext, escape it first::
+Remember that tipi is designed to work with HTML. In case you need to perform replacements on plaintext, escape it first:
+
+.. code-block:: python
 
     >>> fron tipi import tipi
     >>> tipi('b -> c')  # this works only by coincidence!
