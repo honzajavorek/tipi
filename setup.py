@@ -34,19 +34,14 @@ if sys.argv[-1] == 'publish':
 setup(
     name=meta['title'],
     version=meta['version'],
-    description=(
-        'Converting plain ASCII punctuation characters into HTML '
-        'entities according to basic typography rules'
-    ),
+    description='Typographic replacements in HTML',
     author=meta['author'],
     author_email='mail@honzajavorek.cz',
     url='https://github.com/honzajavorek/tipi',
     license=open('LICENSE').read(),
     packages=find_packages(exclude=['tests']),
     include_package_data=True,
-    install_requires=[
-        'lxml',
-    ],
+    install_requires=['lxml'],
     zip_safe=False,
     classifiers=(
         'Development Status :: 4 - Beta',
