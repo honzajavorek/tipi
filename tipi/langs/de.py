@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*- #
 
 """
-English typography
+German typography
 """
 
 
@@ -20,12 +20,12 @@ replacements = base_replacements + (
     (
         re.compile(ur'(?<!"|\w)"(?! |")((?:[^"]+?|")+?)'
                    ur'(?<! |")"(?!["{0}])()'.format(ch), re.U),
-        ur'\u201C\1\u201D'
+        ur'\u201E\1\u201C'
     ),
     # single ''
     (
         re.compile(ur"(?<!'|\w)'(?! |')((?:[^']+?|')+?)"
                    ur"(?<! |')'(?!['{0}])()".format(ch), re.U),
-        ur'\u2018\1\u2019'
+        ur'\u201A\1\u2018'
     ),
 )
