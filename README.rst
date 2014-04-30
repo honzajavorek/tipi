@@ -20,6 +20,13 @@ Ideas behind this project
 - The best existing HTML parser and *tokenizer* for Python is `lxml <http://lxml.de/>`_.
 - There are more languages than English in the world. Each of them has different typographic rules.
 
+Installation
+------------
+
+Easy::
+
+    $ pip install tipi
+
 Quickstart
 ----------
 
