@@ -78,30 +78,30 @@ def test_default_filters():
     repls = [Replacement(re.compile(r'motorcycle'), ur'chopper')]
 
     assert (
-        replace('<code><b>motorcycle</b></code> <b>motorcycle</b>', repls)
-        == '<code><b>motorcycle</b></code> <b>chopper</b>'
+        replace('<code><b>motorcycle</b></code><b>motorcycle</b>', repls)
+        == '<code><b>motorcycle</b></code><b>chopper</b>'
     )
     assert (
-        replace('<kbd><b>motorcycle</b></kbd> <b>motorcycle</b>', repls)
-        == '<kbd><b>motorcycle</b></kbd> <b>chopper</b>'
+        replace('<kbd><b>motorcycle</b></kbd><b>motorcycle</b>', repls)
+        == '<kbd><b>motorcycle</b></kbd><b>chopper</b>'
     )
     assert (
-        replace('<pre><b>motorcycle</b></pre> <b>motorcycle</b>', repls)
-        == '<pre><b>motorcycle</b></pre> <b>chopper</b>'
+        replace('<pre><b>motorcycle</b></pre><b>motorcycle</b>', repls)
+        == '<pre><b>motorcycle</b></pre><b>chopper</b>'
     )
     assert (
-        replace('<samp><b>motorcycle</b></samp> <b>motorcycle</b>', repls)
-        == '<samp><b>motorcycle</b></samp> <b>chopper</b>'
+        replace('<samp><b>motorcycle</b></samp><b>motorcycle</b>', repls)
+        == '<samp><b>motorcycle</b></samp><b>chopper</b>'
     )
     assert (
-        replace('<script><b>motorcycle</b></script> <b>motorcycle</b>', repls)
-        == '<script><b>motorcycle</b></script> <b>chopper</b>'
+        replace('<script><b>motorcycle</b></script><b>motorcycle</b>', repls)
+        == '<script><b>motorcycle</b></script><b>chopper</b>'
     )
     assert (
-        replace('<style><b>motorcycle</b></style> <b>motorcycle</b>', repls)
-        == '<style><b>motorcycle</b></style> <b>chopper</b>'
+        replace('<style><b>motorcycle</b></style><b>motorcycle</b>', repls)
+        == '<style><b>motorcycle</b></style><b>chopper</b>'
     )
     assert (
-        replace('<tt><b>motorcycle</b></tt> <b>motorcycle</b>', repls)
-        == '<tt><b>motorcycle</b></tt> <b>chopper</b>'
+        replace('<tt><b>motorcycle</b></tt><b>motorcycle</b>', repls)
+        == '<tt><b>motorcycle</b></tt><b>chopper</b>'
     )
