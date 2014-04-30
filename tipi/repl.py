@@ -16,9 +16,7 @@ class Replacement(object):
         self.filters = self._parse_filters(filters)
 
     def _parse_filters(self, filters):
-        """Parses filter definitions. Returns list of functions,
-        each of them
-        """
+        """Parses filter definitions. Returns list of functions."""
         if not filters:
             return []
 
