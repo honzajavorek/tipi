@@ -33,6 +33,20 @@ Usage of tipi is very straightforward::
     >>> print html
     <p>„Zavolej mi na čí­slo <strong class="tel">765–876–888</strong>,“ řekla, a zmizela…</p>
 
+Remember that tipi is designed to work with HTML. In case you need to perform replacements on plaintext, escape it first::
+
+    >>> fron tipi import tipi
+    >>> tipi('b -> c')  # this works only by coincidence!
+    u'b → c'
+    >>> tipi('a <- b -> c')
+    u'a  c'
+    >>> import cgi
+    >>> html = cgi.escape(u'a <- b -> c')
+    >>> html
+    u'a &lt;- b -&gt; c'
+    >>> tipi(html)
+    u'a ← b → c'
+
 Alternatives
 ------------
 
