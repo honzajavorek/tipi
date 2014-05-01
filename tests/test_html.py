@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from __future__ import unicode_literals
 
 import pytest
 
@@ -53,13 +53,13 @@ def test_pass_document_get_document():
 
 
 def test_unicode():
-    s = u'<em>Řeřicha</em> stands for cress in <strong>Czech</strong>.'
+    s = '<em>Řeřicha</em> stands for cress in <strong>Czech</strong>.'
     assert unicode(HTMLFragment(s)) == s
 
 
 def test_html_entities_conversions():
     s1 = unicode(HTMLFragment('<b>Honey&nbsp;Bunny</b> &copy;'))
-    s2 = u'<b>Honey\xa0Bunny</b> \xa9'
+    s2 = '<b>Honey\xa0Bunny</b> \xa9'
     assert s1 == s2
 
 
@@ -195,8 +195,8 @@ def test_set_unicode():
     )
     s[0] = u'Ž'
     assert unicode(s) == (
-        u'<strong>Žincent:</strong> Royale with cheese. '
-        u'<!-- Quarter Pounder -->'
+        '<strong>Žincent:</strong> Royale with cheese. '
+        '<!-- Quarter Pounder -->'
     )
     assert s[0] == u'Ž'
 
