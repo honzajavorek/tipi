@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import pytest
 
 from tipi.html import HTMLFragment
+from tipi.compat import unicode
 
 
 def strip_whitespace(s):
