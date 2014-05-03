@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 
 import re
@@ -6,6 +7,8 @@ from string import whitespace
 from collections import namedtuple, MutableSequence
 
 import lxml.html
+
+from tipi.compat import unicode, basestring, range, ToStringMixin
 
 
 __all__ = ('HTMLFragment',)
@@ -47,7 +50,7 @@ Text = namedtuple('TextAddress', 'content element attr')
 CharAddress = namedtuple('CharAddress', 'char element attr index')
 
 
-class HTMLFragment(MutableSequence):
+class HTMLFragment(MutableSequence, ToStringMixin):
     """HTML tree with string-like sequence interface for accessing text
     content of tags.
     """
@@ -177,7 +180,7 @@ class HTMLFragment(MutableSequence):
             target_size = len(addrs)
             change_size = max(len(value), target_size)
 
-            for i in xrange(change_size):
+            for i in range(change_size):
                 is_insert = (i >= target_size)
                 addr = addrs[-1 if is_insert else i] if addrs else pivot_addr
                 change_key = (addr.element, addr.attr)
@@ -247,7 +250,7 @@ class HTMLFragment(MutableSequence):
     def text(self):
         return ''.join(list(self))
 
-    def __unicode__(self):
+    def to_string(self):
         s = lxml.html.tostring(self.tree, encoding=self.output_encoding)
         s = s.decode(self.output_encoding)
 

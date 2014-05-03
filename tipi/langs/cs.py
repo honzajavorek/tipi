@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*- #
+from __future__ import unicode_literals
+
 """
 Czech typography
 
@@ -16,38 +18,38 @@ from .base import base_replacements
 __all__ = ('replacements',)
 
 
-ch = ur'A-Za-z\u00C0-\u02FF\u0370-\u1EFF'
+ch = r'A-Za-z\u00C0-\u02FF\u0370-\u1EFF'
 
 replacements = base_replacements + (
     # date 23. 1. 1978
     (
-        re.compile(ur'(?<!\d)(\d{1,2}\.) (\d{1,2}\.) (\d\d)'),
-        ur'\1\u00a0\2\u00a0\3'
+        re.compile(r'(?<!\d)(\d{1,2}\.) (\d{1,2}\.) (\d\d)'),
+        '\\1\u00a0\\2\u00a0\\3'
     ),
     # date 23. 1.
     (
-        re.compile(ur'(?<!\d)(\d{1,2}\.) (\d{1,2}\.)'),
-        ur'\1\u00a0\2'
+        re.compile(r'(?<!\d)(\d{1,2}\.) (\d{1,2}\.)'),
+        '\\1\u00a0\\2'
     ),
     # space between preposition and word
     (
         re.compile(
-            (ur'(?<=[^0-9{0}])([\x17-\x1F]*[ksvzouiaKSVZOUIA][\x17-\x1F]*)'
-             ur'\s+(?=[\x17-\x1F]*[0-9{0}])').format(ch),
+            (r'(?<=[^0-9{0}])([\x17-\x1F]*[ksvzouiaKSVZOUIA][\x17-\x1F]*)'
+             r'\s+(?=[\x17-\x1F]*[0-9{0}])').format(ch),
             re.M | re.U | re.S
         ),
-        ur'\1\u00a0'
+        '\\1\u00a0'
     ),
     # double ""
     (
-        re.compile(ur'(?<!"|\w)"(?! |")((?:[^"]+?|")+?)'
-                   ur'(?<! |")"(?!["{0}])()'.format(ch), re.U),
-        ur'\u201E\1\u201C'
+        re.compile(r'(?<!"|\w)"(?! |")((?:[^"]+?|")+?)'
+                   r'(?<! |")"(?!["{0}])()'.format(ch), re.U),
+        '\u201E\\1\u201C'
     ),
     # single ''
     (
-        re.compile(ur"(?<!'|\w)'(?! |')((?:[^']+?|')+?)"
-                   ur"(?<! |')'(?!['{0}])()".format(ch), re.U),
-        ur'\u201A\1\u2018'
+        re.compile(r"(?<!'|\w)'(?! |')((?:[^']+?|')+?)"
+                   r"(?<! |')'(?!['{0}])()".format(ch), re.U),
+        '\u201A\\1\u2018'
     ),
 )

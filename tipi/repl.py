@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 
 from functools import partial
 
 from tipi.html import HTMLFragment
+from tipi.compat import unicode, basestring
 
 
 __all__ = ('Replacement', 'replace')

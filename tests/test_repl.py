@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 
 import re
@@ -9,33 +10,34 @@ from tipi.repl import Replacement, replace
 def test_simple_replace():
     s = 'Whose <strong class="vehicle">motorcycle</strong> is this?'
     replacements = (
-        Replacement(re.compile(r'(motorcycle) (is)'), ur'\1\u00a0\2'),
+        Replacement(re.compile(r'(motorcycle) (is)'), '\\1\u00a0\\2'),
     )
     assert (
         replace(s, replacements)
         ==
-        u'Whose <strong class="vehicle">motorcycle</strong>\u00a0is this?'
+        'Whose <strong class="vehicle">motorcycle</strong>\u00a0is this?'
     )
 
 
 def test_multiple_replace():
     s = 'Whose <strong class="vehicle">motorcycle</strong> is this?'
     replacements = (
-        Replacement(re.compile(r'motorcycle'), ur'motor-cycle'),
-        Replacement(re.compile(r' '), ur'\u00a0'),
+        Replacement(re.compile(r'motorcycle'), 'motor-cycle'),
+        Replacement(re.compile(r' '), '\u00a0'),
     )
+    print(repr(replace(s, replacements)))
     assert (
         replace(s, replacements)
         ==
-        (u'Whose\u00a0<strong class="vehicle">motor-cycle'
-         u'</strong>\u00a0is\u00a0this?')
+        ('Whose\u00a0<strong class="vehicle">motor-cycle'
+         '</strong>\u00a0is\u00a0this?')
     )
 
 
 def test_replace_everywhere():
     s = 'Whose <strong>motorcycle</strong> motorcycle is this?'
     replacements = (
-        Replacement(re.compile(r'motorcycle'), ur'motor-cycle'),
+        Replacement(re.compile(r'motorcycle'), 'motor-cycle'),
     )
     assert (
         replace(s, replacements)
@@ -47,7 +49,7 @@ def test_replace_everywhere():
 def test_replace_inside_given_tags_only():
     s = 'Whose <b>motorcycle</b> motorcycle is this?'
     replacements = (
-        Replacement(re.compile(r'motorcycle'), ur'motor-cycle', ['b']),
+        Replacement(re.compile(r'motorcycle'), 'motor-cycle', ['b']),
     )
     assert (
         replace(s, replacements)
@@ -62,7 +64,7 @@ def test_replace_outside_given_tags_only():
         '<b>motorcycle</b> is this?'
     )
     replacements = (
-        Replacement(re.compile(r'motorcycle'), ur'motor-cycle', ['-i']),
+        Replacement(re.compile(r'motorcycle'), 'motor-cycle', ['-i']),
     )
     assert (
         replace(s, replacements)
@@ -75,7 +77,7 @@ def test_replace_outside_given_tags_only():
 
 
 def test_default_filters():
-    repls = [Replacement(re.compile(r'motorcycle'), ur'chopper')]
+    repls = [Replacement(re.compile(r'motorcycle'), 'chopper')]
 
     assert (
         replace('<code><b>motorcycle</b></code><b>motorcycle</b>', repls)

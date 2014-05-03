@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 
 import cgi
@@ -7,6 +8,6 @@ from tipi import tipi
 
 
 def test_plaintext():
-    assert tipi(u'a &lt;- b -&gt; c') == u'a ← b → c'
-    assert tipi(u'a <- b -> c') == u'a  c'
-    assert tipi(cgi.escape(u'a <- b -> c')) == u'a ← b → c'
+    assert tipi('a &lt;- b -&gt; c') == 'a ← b → c'
+    assert tipi('a <- b -> c') == 'a  c'
+    assert tipi(cgi.escape('a <- b -> c')) == 'a ← b → c'
