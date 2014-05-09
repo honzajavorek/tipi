@@ -15,7 +15,7 @@ class Replacement(object):
     """Replacement representation."""
 
     default_filters = ['-code', '-kbd', '-pre', '-samp', '-script',
-                       '-style', '-tt']
+                       '-style', '-tt', '-xmp']
 
     def __init__(self, pattern, replacement, filters=None):
         self.pattern = pattern
