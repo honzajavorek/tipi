@@ -29,6 +29,8 @@ class Replacement(object):
         """Tests whether replacement is allowed on given piece of HTML text."""
         if any(tag in s.parent_tags for tag in self.skipped_elements):
             return False
+        if any(tag not in self.textflow_elements for tag in s.involved_tags):
+            return False
         return True
 
     def replace(self, html):

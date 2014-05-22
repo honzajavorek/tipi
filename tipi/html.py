@@ -14,6 +14,18 @@ from tipi.compat import unicode, basestring, range, ToStringMixin
 __all__ = ('HTMLFragment',)
 
 
+class cached_property(object):
+
+    def __init__(self, factory, attr_name=None):
+        self._attr_name = attr_name or factory.__name__
+        self._factory = factory
+
+    def __get__(self, instance, owner):
+        attr = self._factory(instance)
+        setattr(instance, self._attr_name, attr)
+        return attr
+
+
 class HTMLString(unicode):
     """String with information about parent HTML elements."""
 
@@ -21,37 +33,47 @@ class HTMLString(unicode):
         chars = ''.join(addr.char for addr in addresses)
         s = super(HTMLString, cls).__new__(cls, chars)
         s._addresses = addresses
-        s._parent_groups = None
-        s._parent_tags = None
         return s
 
-    @property
+    @cached_property
     def parent_groups(self):
         """Provides lists of parent HTML elements separately for
         each character.
         """
-        if self._parent_groups is None:
-            groups = []
-            for addr in self._addresses:
-                parents = []
-                if addr.attr == 'text':
-                    parents.append(addr.element)
-                parents.extend(addr.element.iterancestors())
-                groups.append(
-                    p for p in parents if p.tag != HTMLFragment._root_tag
-                )
-            self._parent_groups = groups
-        return self._parent_groups
+        groups = []
+        for addr in self._addresses:
+            parents = []
+            if addr.attr == 'text':
+                parents.append(addr.element)
+            parents.extend(addr.element.iterancestors())
+            groups.append(
+                [p for p in parents if p.tag != HTMLFragment._root_tag]
+            )
+        return groups
 
-    @property
+    @cached_property
     def parent_tags(self):
         """Provides tags of all parent HTML elements."""
-        if self._parent_tags is None:
-            parent_tags = set()
-            for parent_group in self.parent_groups:
-                parent_tags.update(p.tag for p in parent_group)
-            self._parent_tags = frozenset(parent_tags)
-        return self._parent_tags
+        parent_tags = set()
+        for pg in self.parent_groups:
+            parent_tags.update(p.tag for p in pg)
+        return frozenset(parent_tags)
+
+    @cached_property
+    def involved_tags(self):
+        """Provides all HTML tags directly involved in this string."""
+        if len(self.parent_groups) < 2:
+            # there can't be a tag boundary if there's only 1 or 0 characters
+            return frozenset()
+
+        parent_sets = []
+        for pg in self.parent_groups:
+            parent_sets.append(frozenset(pg))
+
+        common_parents = parent_sets[0].intersection(*parent_sets[1:])
+        parent_sets = [ps - common_parents for ps in parent_sets]
+
+        return frozenset(p.tag for p in parent_sets[0].union(*parent_sets[1:]))
 
 
 Text = namedtuple('TextAddress', 'content element attr')
