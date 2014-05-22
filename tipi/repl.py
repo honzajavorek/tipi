@@ -2,10 +2,8 @@
 from __future__ import unicode_literals
 
 
-from functools import partial
-
+from tipi.compat import unicode
 from tipi.html import HTMLFragment
-from tipi.compat import unicode, basestring
 
 
 __all__ = ('Replacement', 'replace')
@@ -14,40 +12,26 @@ __all__ = ('Replacement', 'replace')
 class Replacement(object):
     """Replacement representation."""
 
-    default_filters = ['-code', '-kbd', '-pre', '-samp', '-script',
-                       '-style', '-tt', '-xmp']
+    skipped_tags = (
+        'code', 'kbd', 'pre', 'samp', 'script', 'style', 'tt', 'xmp'
+    )
+    textflow_tags = (
+        'b', 'big', 'i', 'small', 'tt', 'abbr', 'acronym', 'cite',
+        'dfn', 'em', 'kbd', 'strong', 'samp', 'var', 'a', 'bdo', 'q', 'script',
+        'span', 'sub', 'sup'
+    )
 
-    def __init__(self, pattern, replacement, filters=None):
+    def __init__(self, pattern, replacement):
         self.pattern = pattern
         self.replacement = replacement
 
-        filters = (filters or []) + self.default_filters
-        self.filters = self._parse_filters(filters)
-
-    def _parse_filters(self, filters):
-        """Parses filter definitions. Returns list of functions."""
-        if not filters:
-            return []
-
-        funcs = []
-        for f in filters:
-            if isinstance(f, basestring):
-                # filter by tag name
-                if f.startswith('-'):
-                    # replace only if not within this tag
-                    funcs.append(partial(
-                        lambda tag, s: tag not in s.parent_tags,
-                        f[1:]
-                    ))
-                else:
-                    # replace only within this tag
-                    funcs.append(partial(
-                        lambda tag, s: tag in s.parent_tags,
-                        f
-                    ))
-            else:
-                funcs.append(f)  # filter by custom function
-        return funcs
+    def _is_replacement_allowed(self, s):
+        """Tests whether replacement is allowed on given piece of HTML text."""
+        if any(tag in s.parent_tags for tag in self.skipped_tags):
+            return False
+        if any(tag not in self.textflow_tags for tag in s.involved_tags):
+            return False
+        return True
 
     def replace(self, html):
         """Perform replacements on given HTML fragment."""
@@ -60,7 +44,7 @@ class Replacement(object):
             start, stop = match.start() + offset, match.end() + offset
 
             s = self.html[start:stop]
-            if all(f(s) for f in self.filters):  # allowed?
+            if self._is_replacement_allowed(s):
                 repl = match.expand(self.replacement)
                 self.html[start:stop] = repl
             else:

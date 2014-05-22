@@ -14,6 +14,18 @@ from tipi.compat import unicode, basestring, range, ToStringMixin
 __all__ = ('HTMLFragment',)
 
 
+class cached_property(object):
+
+    def __init__(self, factory, attr_name=None):
+        self._attr_name = attr_name or factory.__name__
+        self._factory = factory
+
+    def __get__(self, instance, owner):
+        attr = self._factory(instance)
+        setattr(instance, self._attr_name, attr)
+        return attr
+
+
 class HTMLString(unicode):
     """String with information about parent HTML elements."""
 
@@ -21,27 +33,71 @@ class HTMLString(unicode):
         chars = ''.join(addr.char for addr in addresses)
         s = super(HTMLString, cls).__new__(cls, chars)
         s._addresses = addresses
-        s._parents = None
         return s
 
-    @property
-    def parents(self):
-        """Provides all parent HTML elements."""
-        if self._parents is None:
-            parents = set()
-            for addr in self._addresses:
-                if addr.attr == 'text':
-                    parents.add(addr.element)
-                parents.update(addr.element.iterancestors())
-            self._parents = frozenset(
-                p for p in parents if p.tag != HTMLFragment._root_tag
-            )
-        return self._parents
-
-    @property
+    @cached_property
     def parent_tags(self):
         """Provides tags of all parent HTML elements."""
-        return frozenset(p.tag for p in self.parents)
+        tags = set()
+
+        for addr in self._addresses:
+            if addr.attr == 'text':
+                tags.add(addr.element.tag)
+            tags.update(el.tag for el in addr.element.iterancestors())
+
+        tags.discard(HTMLFragment._root_tag)
+        return frozenset(tags)
+
+    @cached_property
+    def involved_tags(self):
+        """Provides all HTML tags directly involved in this string."""
+        if len(self._addresses) < 2:
+            # there can't be a tag boundary if there's only 1 or 0 characters
+            return frozenset()
+
+        # creating 'parent_sets' mapping, where the first item in tuple
+        # is the address of character and the second is set
+        # of character's parent HTML elements
+        parent_sets = []
+
+        # meanwhile we are creatingalso a set of common parents so we can
+        # put them away later on (we're not interested in them as
+        # they're only some global wrappers)
+        common_parents = set()
+
+        for addr in self._addresses:
+            parents = set()
+            if addr.attr == 'text':
+                parents.add(addr.element)
+            parents.update(addr.element.iterancestors())
+
+            parent_sets.append((addr, parents))
+            if not common_parents:
+                common_parents = parents
+            else:
+                common_parents &= parents
+
+        # constructing final set of involved tags
+        involved_tags = set()
+        prev_addr = None
+
+        for addr, parents in parent_sets:
+            parents = parents - common_parents
+            involved_tags.update(p.tag for p in parents)
+
+            # hidden tags - sometimes there are tags without text which
+            # can hide between characters, but they actually break textflow
+            is_tail_of_hidden = (
+                prev_addr and
+                addr.attr == 'tail' and
+                prev_addr.element != addr.element
+            )
+            if is_tail_of_hidden:
+                involved_tags.add(addr.element)
+
+            prev_addr = addr
+
+        return frozenset(involved_tags)
 
 
 Text = namedtuple('TextAddress', 'content element attr')
