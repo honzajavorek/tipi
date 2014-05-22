@@ -36,44 +36,68 @@ class HTMLString(unicode):
         return s
 
     @cached_property
-    def parent_groups(self):
-        """Provides lists of parent HTML elements separately for
-        each character.
-        """
-        groups = []
-        for addr in self._addresses:
-            parents = []
-            if addr.attr == 'text':
-                parents.append(addr.element)
-            parents.extend(addr.element.iterancestors())
-            groups.append(
-                [p for p in parents if p.tag != HTMLFragment._root_tag]
-            )
-        return groups
-
-    @cached_property
     def parent_tags(self):
         """Provides tags of all parent HTML elements."""
-        parent_tags = set()
-        for pg in self.parent_groups:
-            parent_tags.update(p.tag for p in pg)
-        return frozenset(parent_tags)
+        tags = set()
+
+        for addr in self._addresses:
+            if addr.attr == 'text':
+                tags.add(addr.element.tag)
+            tags.update(el.tag for el in addr.element.iterancestors())
+
+        tags.discard(HTMLFragment._root_tag)
+        return frozenset(tags)
 
     @cached_property
     def involved_tags(self):
         """Provides all HTML tags directly involved in this string."""
-        if len(self.parent_groups) < 2:
+        if len(self._addresses) < 2:
             # there can't be a tag boundary if there's only 1 or 0 characters
             return frozenset()
 
+        # creating 'parent_sets' mapping, where the first item in tuple
+        # is the address of character and the second is set
+        # of character's parent HTML elements
         parent_sets = []
-        for pg in self.parent_groups:
-            parent_sets.append(frozenset(pg))
 
-        common_parents = parent_sets[0].intersection(*parent_sets[1:])
-        parent_sets = [ps - common_parents for ps in parent_sets]
+        # meanwhile we are creatingalso a set of common parents so we can
+        # put them away later on (we're not interested in them as
+        # they're only some global wrappers)
+        common_parents = set()
 
-        return frozenset(p.tag for p in parent_sets[0].union(*parent_sets[1:]))
+        for addr in self._addresses:
+            parents = set()
+            if addr.attr == 'text':
+                parents.add(addr.element)
+            parents.update(addr.element.iterancestors())
+
+            parent_sets.append((addr, parents))
+            if not common_parents:
+                common_parents = parents
+            else:
+                common_parents &= parents
+
+        # constructing final set of involved tags
+        involved_tags = set()
+        prev_addr = None
+
+        for addr, parents in parent_sets:
+            parents = parents - common_parents
+            involved_tags.update(p.tag for p in parents)
+
+            # hidden tags - sometimes there are tags without text which
+            # can hide between characters, but they actually break textflow
+            is_tail_of_hidden = (
+                prev_addr and
+                addr.attr == 'tail' and
+                prev_addr.element != addr.element
+            )
+            if is_tail_of_hidden:
+                involved_tags.add(addr.element)
+
+            prev_addr = addr
+
+        return frozenset(involved_tags)
 
 
 Text = namedtuple('TextAddress', 'content element attr')
