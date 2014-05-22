@@ -367,13 +367,13 @@ def test_negative_index():
 
 def test_parent_element_on_item():
     s = HTMLFragment('Whose motorcycle is <strong>this</strong>?')
-    assert s[0].parents == frozenset()
+    assert s[0].parent_tags == frozenset()
     assert s[21].parent_tags == frozenset(['strong'])
 
 
 def test_parent_element_on_slice():
     s = HTMLFragment('Whose <div>motorcycle is <b>this</b>?</div>')
-    assert s[0:3].parents == frozenset()
+    assert s[0:3].parent_tags == frozenset()
     assert s[7:10].parent_tags == frozenset(['div'])
     assert s[21:22].parent_tags == frozenset(['div', 'b'])
     assert s[7:21].parent_tags == frozenset(['div', 'b'])

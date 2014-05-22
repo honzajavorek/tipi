@@ -21,27 +21,37 @@ class HTMLString(unicode):
         chars = ''.join(addr.char for addr in addresses)
         s = super(HTMLString, cls).__new__(cls, chars)
         s._addresses = addresses
-        s._parents = None
+        s._parent_groups = None
+        s._parent_tags = None
         return s
 
     @property
-    def parents(self):
-        """Provides all parent HTML elements."""
-        if self._parents is None:
-            parents = set()
+    def parent_groups(self):
+        """Provides lists of parent HTML elements separately for
+        each character.
+        """
+        if self._parent_groups is None:
+            groups = []
             for addr in self._addresses:
+                parents = []
                 if addr.attr == 'text':
-                    parents.add(addr.element)
-                parents.update(addr.element.iterancestors())
-            self._parents = frozenset(
-                p for p in parents if p.tag != HTMLFragment._root_tag
-            )
-        return self._parents
+                    parents.append(addr.element)
+                parents.extend(addr.element.iterancestors())
+                groups.append(
+                    p for p in parents if p.tag != HTMLFragment._root_tag
+                )
+            self._parent_groups = groups
+        return self._parent_groups
 
     @property
     def parent_tags(self):
         """Provides tags of all parent HTML elements."""
-        return frozenset(p.tag for p in self.parents)
+        if self._parent_tags is None:
+            parent_tags = set()
+            for parent_group in self.parent_groups:
+                parent_tags.update(p.tag for p in parent_group)
+            self._parent_tags = frozenset(parent_tags)
+        return self._parent_tags
 
 
 Text = namedtuple('TextAddress', 'content element attr')
