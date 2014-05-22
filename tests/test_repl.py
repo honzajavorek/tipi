@@ -107,3 +107,21 @@ def test_default_filters():
         replace('<tt><b>motorcycle</b></tt><b>motorcycle</b>', repls)
         == '<tt><b>motorcycle</b></tt><b>chopper</b>'
     )
+
+
+def test_replace_within_blocks_only():
+    s = (
+        '<h1>Pulp Fiction</h1>'
+        '<h2>Whose motor</h2>'
+        '<p>cycle is this?</p>'
+        '<h2>Whose motor</h2>'
+        '<p><b>cycle</b> is this?</p>'
+        '<h2>Whose motor</h2>'
+        'cycle is this?'
+        '<h2>Whose motor</h2>'
+        '<b>cycle</b> is this?'
+    )
+    replacements = (
+        Replacement(re.compile(r'motorcycle'), 'motor-cycle'),
+    )
+    assert replace(s, replacements) == s
