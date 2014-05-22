@@ -84,6 +84,6 @@ Plans
 License: MIT
 ------------
 
-© 2013 Jan Javorek <mail@honzajavorek.cz>
+© 2013-2014 Jan Javorek <mail@honzajavorek.cz>
 
 This work is licensed under `MIT license <https://en.wikipedia.org/wiki/MIT_License>`_.

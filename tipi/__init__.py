@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 
 
 __title__ = 'tipi'
-__version__ = '0.0.3'
+__version__ = '0.0.4'
 __author__ = 'Honza Javorek'
 __license__ = 'MIT'
-__copyright__ = 'Copyright 2013 Honza Javorek'
+__copyright__ = 'Copyright 2013-2014 Honza Javorek'
 
 
 from tipi.langs import langs
