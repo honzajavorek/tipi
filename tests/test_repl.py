@@ -34,49 +34,7 @@ def test_multiple_replace():
     )
 
 
-def test_replace_everywhere():
-    s = 'Whose <strong>motorcycle</strong> motorcycle is this?'
-    replacements = (
-        Replacement(re.compile(r'motorcycle'), 'motor-cycle'),
-    )
-    assert (
-        replace(s, replacements)
-        ==
-        ('Whose <strong>motor-cycle</strong> motor-cycle is this?')
-    )
-
-
-def test_replace_inside_given_tags_only():
-    s = 'Whose <b>motorcycle</b> motorcycle is this?'
-    replacements = (
-        Replacement(re.compile(r'motorcycle'), 'motor-cycle', ['b']),
-    )
-    assert (
-        replace(s, replacements)
-        ==
-        ('Whose <b>motor-cycle</b> motorcycle is this?')
-    )
-
-
-def test_replace_outside_given_tags_only():
-    s = (
-        'Whose <i><b>motorcycle</b></i> '
-        '<b>motorcycle</b> is this?'
-    )
-    replacements = (
-        Replacement(re.compile(r'motorcycle'), 'motor-cycle', ['-i']),
-    )
-    assert (
-        replace(s, replacements)
-        ==
-        (
-            'Whose <i><b>motorcycle</b></i> '
-            '<b>motor-cycle</b> is this?'
-        )
-    )
-
-
-def test_default_filters():
+def test_skipped_elements():
     repls = [Replacement(re.compile(r'motorcycle'), 'chopper')]
 
     assert (
@@ -109,7 +67,7 @@ def test_default_filters():
     )
 
 
-def test_replace_within_blocks_only():
+def test_textflow_elements():
     s = (
         '<h1>Pulp Fiction</h1>'
         '<h2>Whose motor</h2>'
@@ -120,6 +78,10 @@ def test_replace_within_blocks_only():
         'cycle is this?'
         '<h2>Whose motor</h2>'
         '<b>cycle</b> is this?'
+        '<h2>Whose</h2>'
+        'motor<img>cycle is this?'
+        '<h2>Whose</h2>'
+        'motor<p></p>cycle is this?'
     )
     replacements = (
         Replacement(re.compile(r'motorcycle'), 'motor-cycle'),
