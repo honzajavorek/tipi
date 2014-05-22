@@ -12,10 +12,10 @@ __all__ = ('Replacement', 'replace')
 class Replacement(object):
     """Replacement representation."""
 
-    skipped_elements = (
+    skipped_tags = (
         'code', 'kbd', 'pre', 'samp', 'script', 'style', 'tt', 'xmp'
     )
-    textflow_elements = (
+    textflow_tags = (
         'b', 'big', 'i', 'small', 'tt', 'abbr', 'acronym', 'cite',
         'dfn', 'em', 'kbd', 'strong', 'samp', 'var', 'a', 'bdo', 'q', 'script',
         'span', 'sub', 'sup'
@@ -27,9 +27,9 @@ class Replacement(object):
 
     def _is_replacement_allowed(self, s):
         """Tests whether replacement is allowed on given piece of HTML text."""
-        if any(tag in s.parent_tags for tag in self.skipped_elements):
+        if any(tag in s.parent_tags for tag in self.skipped_tags):
             return False
-        if any(tag not in self.textflow_elements for tag in s.involved_tags):
+        if any(tag not in self.textflow_tags for tag in s.involved_tags):
             return False
         return True
 
