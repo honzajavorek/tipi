@@ -2,15 +2,21 @@
 Tipi
 ====
 
-.. image:: https://travis-ci.org/honzajavorek/tipi.png
-   :target: https://travis-ci.org/honzajavorek/tipi
-
 Tipi is for typographic replacements in HTML.
 
 Status: ACTIVE
 --------------
 
 Under active development and maintenance.
+
+.. image:: https://travis-ci.org/honzajavorek/tipi.png?branch=master
+   :target: https://travis-ci.org/honzajavorek/tipi
+.. image:: https://coveralls.io/repos/honzajavorek/tipi/badge.png?branch=master
+    :target: https://coveralls.io/r/honzajavorek/tipi?branch=master
+.. image:: https://pypip.in/v/tipi/badge.png
+    :target: http://pypi.python.org/pypi/tipi/
+.. image:: https://pypip.in/d/tipi/badge.png
+    :target: http://pypi.python.org/pypi/tipi/
 
 Ideas behind this project
 -------------------------
@@ -35,10 +41,10 @@ Usage of tipi is very straightforward:
 .. code-block:: python
 
     >>> from tipi import tipi
-    >>> html = '<p>"Zavolej mi na číslo <strong class="tel">765-876-888</strong>," řekla, a zmizela...</p>"'
+    >>> html = '<p>"Zavolej mi na číslo <strong class="tel">765-876-888</strong>," řekla, a zmizela...</p>'
     >>> html = tipi(html, lang='cs')
     >>> html
-    u'<p>\u201eZavolej mi na \u010d\xed\xadslo <strong class="tel">765\u2013876\u2013888</strong>,\u201c \u0159ekla, a\xa0zmizela\u2026</p>'
+    '<p>\u201eZavolej mi na \u010d\xed\xadslo <strong class="tel">765\u2013876\u2013888</strong>,\u201c \u0159ekla, a\xa0zmizela\u2026</p>'
     >>> print html
     <p>„Zavolej mi na čí­slo <strong class="tel">765–876–888</strong>,“ řekla, a zmizela…</p>
 

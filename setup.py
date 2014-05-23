@@ -35,6 +35,7 @@ setup(
     name=meta['title'],
     version=meta['version'],
     description='Typographic replacements in HTML',
+    long_description=open('README.rst').read(),
     author=meta['author'],
     author_email='mail@honzajavorek.cz',
     url='https://github.com/honzajavorek/tipi',
