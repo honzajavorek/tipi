@@ -4,19 +4,10 @@ Tipi
 
 Tipi is for typographic replacements in HTML.
 
-Status: ACTIVE
---------------
-
-Under active development and maintenance.
-
 .. image:: https://travis-ci.org/honzajavorek/tipi.png?branch=master
    :target: https://travis-ci.org/honzajavorek/tipi
 .. image:: https://coveralls.io/repos/honzajavorek/tipi/badge.png?branch=master
     :target: https://coveralls.io/r/honzajavorek/tipi?branch=master
-.. image:: https://pypip.in/v/tipi/badge.png
-    :target: http://pypi.python.org/pypi/tipi/
-.. image:: https://pypip.in/d/tipi/badge.png
-    :target: http://pypi.python.org/pypi/tipi/
 
 Ideas behind this project
 -------------------------
